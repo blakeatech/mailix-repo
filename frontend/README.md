@@ -38,321 +38,142 @@ Modern, responsive frontend for Notaic - an email automation and management plat
 
 ## Frontend Architecture
 
-### Application Architecture
-
-```mermaid
-graph TB
-    subgraph "Next.js App Router"
-        LAYOUT[app/layout.tsx<br/>Root Layout]
-        PAGES[Page Components<br/>app/*/page.tsx]
-        LOADING[Loading States<br/>loading.tsx]
-        ERROR[Error Boundaries<br/>error.tsx]
-    end
-    
-    subgraph "Component Layer"
-        UI[UI Components<br/>components/ui/*]
-        SHARED[Shared Components<br/>components/shared/*]
-        PAGES_COMP[Page Components<br/>components/*]
-        FORMS[Form Components<br/>React Hook Form]
-    end
-    
-    subgraph "State Management"
-        LOCAL[Local State<br/>useState/useReducer]
-        CONTEXT[React Context<br/>Global State]
-        STORAGE[Local Storage<br/>Token Management]
-        CACHE[API Cache<br/>SWR/React Query]
-    end
-    
-    subgraph "Styling & UI"
-        TAILWIND[TailwindCSS<br/>Utility Classes]
-        RADIX[Radix UI<br/>Primitives]
-        FRAMER[Framer Motion<br/>Animations]
-        CHARTS[Chart.js<br/>Data Visualization]
-    end
-    
-    subgraph "External Services"
-        API[Backend API<br/>FastAPI]
-        STRIPE[Stripe<br/>Payment Processing]
-        OAUTH[OAuth Providers<br/>Google]
-    end
-    
-    LAYOUT --> PAGES
-    PAGES --> PAGES_COMP
-    PAGES_COMP --> UI
-    PAGES_COMP --> SHARED
-    PAGES_COMP --> FORMS
-    
-    PAGES_COMP --> LOCAL
-    PAGES_COMP --> CONTEXT
-    PAGES_COMP --> STORAGE
-    PAGES_COMP --> CACHE
-    
-    UI --> TAILWIND
-    UI --> RADIX
-    SHARED --> FRAMER
-    PAGES_COMP --> CHARTS
-    
-    PAGES_COMP --> API
-    FORMS --> STRIPE
-    PAGES_COMP --> OAUTH
-    
-    style LAYOUT fill:#000,color:#fff
-    style TAILWIND fill:#38B2AC,color:#fff
-    style API fill:#009688,color:#fff
-    style STRIPE fill:#635bff,color:#fff
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           NOTAIC FRONTEND ARCHITECTURE                     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                        NEXT.JS APP ROUTER                          │   │
+│  │                                                                     │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐ │   │
+│  │  │app/layout   │  │app/page.tsx │  │app/dashboard│  │app/settings │ │   │
+│  │  │.tsx (Root)  │  │(Landing)    │  │/page.tsx    │  │/page.tsx    │ │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘ │   │
+│  │                                                                     │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐ │   │
+│  │  │app/signin   │  │app/pro      │  │app/help     │  │loading.tsx  │ │   │
+│  │  │/page.tsx    │  │/page.tsx    │  │/page.tsx    │  │error.tsx    │ │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘ │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                   │                                        │
+│  ┌─────────────────────────────────┼─────────────────────────────────────┐  │
+│  │                    COMPONENT LAYER                                   │  │
+│  │                                                                       │  │
+│  │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐   │  │
+│  │  │  UI Components  │    │ Shared Components│    │ Page Components │   │  │
+│  │  │                 │    │                  │    │                 │   │  │
+│  │  │ • Button        │    │ • Header         │    │ • GetStarted    │   │  │
+│  │  │ • Input         │    │ • Sidebar        │    │ • SignIn        │   │  │
+│  │  │ • Card          │    │ • Footer         │    │ • Dashboard     │   │  │
+│  │  │ • Modal         │    │ • Loading        │    │ • Settings      │   │  │
+│  │  │ • Dropdown      │    │ • ErrorBoundary  │    │ • Premium       │   │  │
+│  │  └─────────────────┘    └─────────────────┘    └─────────────────┘   │  │
+│  └─────────────────────────────────┼─────────────────────────────────────┘  │
+│                                   │                                        │
+│  ┌─────────────────────────────────┼─────────────────────────────────────┐  │
+│  │                   STATE MANAGEMENT                                   │  │
+│  │                                                                       │  │
+│  │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐   │  │
+│  │  │  Local State    │    │ React Context   │    │ Browser Storage │   │  │
+│  │  │                 │    │                 │    │                 │   │  │
+│  │  │ • useState      │    │ • AuthContext   │    │ • localStorage  │   │  │
+│  │  │ • useReducer    │    │ • ThemeContext  │    │ • sessionStorage│   │  │
+│  │  │ • useEffect     │    │ • UserContext   │    │ • Token Mgmt    │   │  │
+│  │  └─────────────────┘    └─────────────────┘    └─────────────────┘   │  │
+│  └─────────────────────────────────┼─────────────────────────────────────┘  │
+│                                   │                                        │
+│  ┌─────────────────────────────────┼─────────────────────────────────────┐  │
+│  │                   STYLING & UI SYSTEM                                │  │
+│  │                                                                       │  │
+│  │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐   │  │
+│  │  │   TailwindCSS   │    │   Radix UI      │    │  Framer Motion  │   │  │
+│  │  │                 │    │                 │    │                 │   │  │
+│  │  │ • Utility Classes│    │ • Primitives    │    │ • Animations    │   │  │
+│  │  │ • Custom Theme  │    │ • Accessibility │    │ • Transitions   │   │  │
+│  │  │ • Responsive    │    │ • Components    │    │ • Gestures      │   │  │
+│  │  └─────────────────┘    └─────────────────┘    └─────────────────┘   │  │
+│  │                                                                       │  │
+│  │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐   │  │
+│  │  │    Chart.js     │    │  React Hook     │    │   TypeScript    │   │  │
+│  │  │                 │    │     Form        │    │                 │   │  │
+│  │  │ • Data Viz      │    │ • Form Handling │    │ • Type Safety   │   │  │
+│  │  │ • Interactive   │    │ • Validation    │    │ • IntelliSense  │   │  │
+│  │  │ • Charts        │    │ • Error Handling│    │ • Compile Check │   │  │
+│  │  └─────────────────┘    └─────────────────┘    └─────────────────┘   │  │
+│  └─────────────────────────────────┼─────────────────────────────────────┘  │
+│                                   │                                        │
+│  ┌─────────────────────────────────┼─────────────────────────────────────┐  │
+│  │                  EXTERNAL INTEGRATIONS                               │  │
+│  │                                                                       │  │
+│  │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐   │  │
+│  │  │  Backend API    │    │   Stripe.js     │    │  Google OAuth   │   │  │
+│  │  │                 │    │                 │    │                 │   │  │
+│  │  │ • FastAPI       │    │ • Payment Forms │    │ • Authentication│   │  │
+│  │  │ • REST Endpoints│    │ • Secure Checkout│    │ • User Profile  │   │  │
+│  │  │ • JWT Auth      │    │ • Subscriptions │    │ • OAuth Flow    │   │  │
+│  │  └─────────────────┘    └─────────────────┘    └─────────────────┘   │  │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Component Hierarchy
+## Component Flow
 
-```mermaid
-graph TB
-    subgraph "App Structure"
-        ROOT[app/layout.tsx<br/>Root Layout]
-        
-        subgraph "Public Pages"
-            HOME[app/page.tsx<br/>Landing Page]
-            SIGNIN[app/signin/page.tsx<br/>Sign In]
-            EXAMPLE[app/example/page.tsx<br/>Examples]
-        end
-        
-        subgraph "Protected Pages"
-            DASHBOARD[app/dashboard/page.tsx<br/>Dashboard]
-            SETTINGS[app/settings/page.tsx<br/>Settings]
-            PRO[app/pro/page.tsx<br/>Premium]
-            HELP[app/help/page.tsx<br/>Help & Support]
-        end
-    end
-    
-    subgraph "Component Library"
-        subgraph "Page Components"
-            GET_STARTED[GetStartedPage]
-            SIGNIN_COMP[SignInPage]
-            DASHBOARD_COMP[DashboardPage]
-            SETTINGS_COMP[SettingsPage]
-            PREMIUM_COMP[PremiumPage]
-        end
-        
-        subgraph "UI Components"
-            BUTTON[Button]
-            INPUT[Input]
-            CARD[Card]
-            MODAL[Modal]
-            DROPDOWN[Dropdown]
-        end
-        
-        subgraph "Shared Components"
-            HEADER[Header]
-            SIDEBAR[Sidebar]
-            FOOTER[Footer]
-            LOADING[LoadingSpinner]
-            ERROR_COMP[ErrorBoundary]
-        end
-    end
-    
-    ROOT --> HOME
-    ROOT --> SIGNIN
-    ROOT --> EXAMPLE
-    ROOT --> DASHBOARD
-    ROOT --> SETTINGS
-    ROOT --> PRO
-    ROOT --> HELP
-    
-    HOME --> GET_STARTED
-    SIGNIN --> SIGNIN_COMP
-    DASHBOARD --> DASHBOARD_COMP
-    SETTINGS --> SETTINGS_COMP
-    PRO --> PREMIUM_COMP
-    
-    GET_STARTED --> BUTTON
-    GET_STARTED --> CARD
-    SIGNIN_COMP --> INPUT
-    SIGNIN_COMP --> BUTTON
-    DASHBOARD_COMP --> HEADER
-    DASHBOARD_COMP --> SIDEBAR
-    
-    style ROOT fill:#000,color:#fff
-    style DASHBOARD_COMP fill:#4CAF50,color:#fff
-    style BUTTON fill:#2196F3,color:#fff
-    style CARD fill:#FF9800,color:#fff
+```
+User Interaction Flow:
+┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐
+│  User   │───▶│  Page   │───▶│Component│───▶│  Hook   │───▶│   API   │
+│ Action  │    │Component│    │ Handler │    │ (State) │    │ Request │
+└─────────┘    └─────────┘    └─────────┘    └─────────┘    └─────────┘
+     ▲              │              │              │              │
+     │              ▼              ▼              ▼              ▼
+┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐
+│   UI    │◀───│  State  │◀───│ Context │◀───│ Update  │◀───│Response │
+│ Update  │    │ Change  │    │ Update  │    │  State  │    │  Data   │
+└─────────┘    └─────────┘    └─────────┘    └─────────┘    └─────────┘
+
+Authentication Flow:
+┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐
+│ Login   │───▶│ Form    │───▶│ Submit  │───▶│  Auth   │───▶│ Store   │
+│ Page    │    │Validate │    │ Handler │    │ Service │    │ Token   │
+└─────────┘    └─────────┘    └─────────┘    └─────────┘    └─────────┘
+     ▲              │              │              │              │
+     │              ▼              ▼              ▼              ▼
+┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐
+│Dashboard│◀───│Redirect │◀───│ Success │◀───│ Context │◀───│ Update  │
+│ Access  │    │ User    │    │Response │    │ Update  │    │ State   │
+└─────────┘    └─────────┘    └─────────┘    └─────────┘    └─────────┘
 ```
 
-### State Management Flow
+## Responsive Design
 
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant C as Component
-    participant S as State
-    participant API as Backend API
-    participant LS as Local Storage
-    
-    Note over U,LS: Authentication Flow
-    U->>C: Login Action
-    C->>API: POST /auth/signin
-    API-->>C: {token, user_data}
-    C->>LS: Store Token
-    C->>S: Update Auth State
-    S-->>C: Re-render UI
-    C-->>U: Dashboard View
-    
-    Note over U,LS: Data Fetching Flow
-    U->>C: Navigate to Dashboard
-    C->>LS: Get Token
-    C->>API: GET /dashboard/data
-    API-->>C: Dashboard Data
-    C->>S: Update Dashboard State
-    S-->>C: Re-render Components
-    C-->>U: Updated Dashboard
-    
-    Note over U,LS: Form Submission Flow
-    U->>C: Submit Form
-    C->>S: Validate Form Data
-    S-->>C: Validation Result
-    C->>API: POST /api/endpoint
-    API-->>C: Success Response
-    C->>S: Update UI State
-    S-->>C: Show Success Message
-    C-->>U: Feedback
 ```
+Breakpoint System:
+┌─────────────┬─────────────┬─────────────┬─────────────┬─────────────┐
+│   Mobile    │   Tablet    │   Desktop   │    Large    │   X-Large   │
+│   < 640px   │  640-768px  │ 768-1024px  │ 1024-1280px │  > 1280px   │
+├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
+│             │             │             │             │             │
+│ • Stack     │ • 2 Columns │ • 3 Columns │ • 4 Columns │ • 5 Columns │
+│ • Full      │ • Sidebar   │ • Grid      │ • Wide Grid │ • Max Width │
+│ • Mobile    │ • Compact   │ • Standard  │ • Spacious  │ • Centered  │
+│   Menu      │   Layout    │   Layout    │   Layout    │   Layout    │
+│             │             │             │             │             │
+└─────────────┴─────────────┴─────────────┴─────────────┴─────────────┘
 
-### UI Component System
+Layout Adaptation:
+Mobile (sm):     [Header]
+                 [Content]
+                 [Footer]
 
-```mermaid
-graph LR
-    subgraph "Design System"
-        TOKENS[Design Tokens<br/>Colors, Spacing, Typography]
-        THEME[Theme Configuration<br/>tailwind.config.ts]
-    end
-    
-    subgraph "Base Components"
-        BUTTON[Button<br/>Primary, Secondary, Ghost]
-        INPUT[Input<br/>Text, Email, Password]
-        CARD[Card<br/>Header, Content, Footer]
-        MODAL[Modal<br/>Dialog, Drawer]
-    end
-    
-    subgraph "Composite Components"
-        FORM[Form Components<br/>Login, Register, Settings]
-        DASHBOARD[Dashboard Widgets<br/>Charts, Stats, Tables]
-        NAVIGATION[Navigation<br/>Header, Sidebar, Breadcrumbs]
-    end
-    
-    subgraph "Page Templates"
-        AUTH_TEMPLATE[Authentication Pages]
-        DASHBOARD_TEMPLATE[Dashboard Layout]
-        SETTINGS_TEMPLATE[Settings Layout]
-    end
-    
-    TOKENS --> THEME
-    THEME --> BUTTON
-    THEME --> INPUT
-    THEME --> CARD
-    THEME --> MODAL
-    
-    BUTTON --> FORM
-    INPUT --> FORM
-    CARD --> DASHBOARD
-    MODAL --> NAVIGATION
-    
-    FORM --> AUTH_TEMPLATE
-    DASHBOARD --> DASHBOARD_TEMPLATE
-    NAVIGATION --> SETTINGS_TEMPLATE
-    
-    style TOKENS fill:#9C27B0,color:#fff
-    style BUTTON fill:#2196F3,color:#fff
-    style FORM fill:#4CAF50,color:#fff
-    style AUTH_TEMPLATE fill:#FF9800,color:#fff
-```
+Tablet (md):     [Header    ]
+                 [Side|Main ]
+                 [Footer    ]
 
-### Data Flow & API Integration
-
-```mermaid
-graph TB
-    subgraph "Frontend Data Layer"
-        COMPONENTS[React Components]
-        HOOKS[Custom Hooks<br/>useAuth, useAPI]
-        CONTEXT[Context Providers<br/>AuthContext]
-        STORAGE[Browser Storage<br/>localStorage, sessionStorage]
-    end
-    
-    subgraph "API Layer"
-        AXIOS[Axios Client<br/>HTTP Requests]
-        INTERCEPTORS[Request/Response<br/>Interceptors]
-        ERROR_HANDLER[Error Handling<br/>Global Error Boundary]
-    end
-    
-    subgraph "Backend Integration"
-        AUTH_API[Authentication API<br/>/auth/*]
-        USER_API[User Management API<br/>/account/*]
-        EMAIL_API[Email Processing API<br/>/email/*]
-        PAYMENT_API[Payment API<br/>/subscription/*]
-    end
-    
-    subgraph "External Services"
-        STRIPE_JS[Stripe.js<br/>Payment Processing]
-        GOOGLE_OAUTH[Google OAuth<br/>Authentication]
-    end
-    
-    COMPONENTS --> HOOKS
-    HOOKS --> CONTEXT
-    HOOKS --> STORAGE
-    HOOKS --> AXIOS
-    
-    AXIOS --> INTERCEPTORS
-    INTERCEPTORS --> ERROR_HANDLER
-    
-    AXIOS --> AUTH_API
-    AXIOS --> USER_API
-    AXIOS --> EMAIL_API
-    AXIOS --> PAYMENT_API
-    
-    COMPONENTS --> STRIPE_JS
-    COMPONENTS --> GOOGLE_OAUTH
-    
-    style COMPONENTS fill:#61DAFB,color:#000
-    style HOOKS fill:#4CAF50,color:#fff
-    style AXIOS fill:#009688,color:#fff
-    style STRIPE_JS fill:#635bff,color:#fff
-```
-
-### Responsive Design System
-
-```mermaid
-graph LR
-    subgraph "Breakpoints"
-        SM[sm: 640px<br/>Mobile]
-        MD[md: 768px<br/>Tablet]
-        LG[lg: 1024px<br/>Desktop]
-        XL[xl: 1280px<br/>Large Desktop]
-    end
-    
-    subgraph "Layout Components"
-        GRID[CSS Grid<br/>Dashboard Layout]
-        FLEX[Flexbox<br/>Component Layout]
-        CONTAINER[Container<br/>Max Width Control]
-    end
-    
-    subgraph "Responsive Features"
-        NAV[Navigation<br/>Mobile Menu Toggle]
-        SIDEBAR[Sidebar<br/>Collapsible on Mobile]
-        TABLES[Tables<br/>Horizontal Scroll]
-        MODALS[Modals<br/>Full Screen on Mobile]
-    end
-    
-    SM --> GRID
-    MD --> FLEX
-    LG --> CONTAINER
-    XL --> CONTAINER
-    
-    GRID --> NAV
-    FLEX --> SIDEBAR
-    CONTAINER --> TABLES
-    CONTAINER --> MODALS
-    
-    style SM fill:#FF5722,color:#fff
-    style MD fill:#FF9800,color:#fff
-    style LG fill:#4CAF50,color:#fff
-    style XL fill:#2196F3,color:#fff
+Desktop (lg+):   [Header         ]
+                 [Side|Main|Extra]
+                 [Footer         ]
 ```
 
 ## 🚀 Getting Started
