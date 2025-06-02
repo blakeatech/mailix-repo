@@ -32,284 +32,266 @@ Notaic is a sophisticated email automation and management platform built with Fa
 
 ## Backend Architecture
 
-### API Service Architecture
-
-```mermaid
-graph TB
-    subgraph "FastAPI Application"
-        MAIN[main.py<br/>Application Entry Point]
-        DEPS[dependencies.py<br/>Dependency Injection]
-    end
-    
-    subgraph "API Routers"
-        AUTH_R[auth_router<br/>/auth/*]
-        OAUTH_R[oauth_router<br/>/auth/oauth/*]
-        ACCOUNT_R[account_router<br/>/account/*]
-        SETTINGS_R[settings_router<br/>/user/*]
-        SUB_R[subscription_router<br/>/subscription/*]
-    end
-    
-    subgraph "Service Layer"
-        AUTH_S[Authentication Service<br/>JWT + Password Hashing]
-        OAUTH_S[OAuth Service<br/>Google Integration]
-        EMAIL_S[Email Service<br/>SMTP + Templates]
-        GMAIL_S[Gmail Service<br/>API Integration]
-        STRIPE_S[Stripe Service<br/>Payment Processing]
-        OPENAI_S[OpenAI Service<br/>AI Email Generation]
-    end
-    
-    subgraph "Data Access Layer"
-        FIRESTORE[Firestore Client<br/>Database Operations]
-        STORAGE[Cloud Storage<br/>File Operations]
-    end
-    
-    subgraph "External APIs"
-        GOOGLE[Google APIs<br/>Gmail + OAuth]
-        STRIPE_API[Stripe API<br/>Payments]
-        OPENAI_API[OpenAI API<br/>GPT Models]
-        FIREBASE[Firebase<br/>Authentication]
-    end
-    
-    MAIN --> AUTH_R
-    MAIN --> OAUTH_R
-    MAIN --> ACCOUNT_R
-    MAIN --> SETTINGS_R
-    MAIN --> SUB_R
-    
-    AUTH_R --> AUTH_S
-    OAUTH_R --> OAUTH_S
-    ACCOUNT_R --> EMAIL_S
-    SETTINGS_R --> GMAIL_S
-    SUB_R --> STRIPE_S
-    
-    AUTH_S --> FIRESTORE
-    OAUTH_S --> GOOGLE
-    EMAIL_S --> FIRESTORE
-    GMAIL_S --> GOOGLE
-    STRIPE_S --> STRIPE_API
-    OPENAI_S --> OPENAI_API
-    
-    OAUTH_S --> OPENAI_S
-    EMAIL_S --> OPENAI_S
-    
-    style MAIN fill:#009688,color:#fff
-    style AUTH_S fill:#4CAF50,color:#fff
-    style FIRESTORE fill:#ff6f00,color:#fff
-    style GOOGLE fill:#ea4335,color:#fff
-    style STRIPE_API fill:#635bff,color:#fff
-    style OPENAI_API fill:#10a37f,color:#fff
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           NOTAIC BACKEND ARCHITECTURE                      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                        FASTAPI APPLICATION                         │   │
+│  │                                                                     │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐ │   │
+│  │  │   main.py   │  │dependencies │  │ middleware  │  │   config    │ │   │
+│  │  │(Entry Point)│  │   .py       │  │   stack     │  │  settings   │ │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘ │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                   │                                        │
+│  ┌─────────────────────────────────┼─────────────────────────────────────┐  │
+│  │                      API ROUTERS                                     │  │
+│  │                                                                       │  │
+│  │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐   │  │
+│  │  │  auth_router    │    │  oauth_router   │    │ account_router  │   │  │
+│  │  │   /auth/*       │    │ /auth/oauth/*   │    │  /account/*     │   │  │
+│  │  └─────────────────┘    └─────────────────┘    └─────────────────┘   │  │
+│  │                                                                       │  │
+│  │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐   │  │
+│  │  │settings_router  │    │subscription_    │    │   email_router  │   │  │
+│  │  │   /user/*       │    │   router        │    │   /email/*      │   │  │
+│  │  │                 │    │ /subscription/* │    │                 │   │  │
+│  │  └─────────────────┘    └─────────────────┘    └─────────────────┘   │  │
+│  └─────────────────────────────────┼─────────────────────────────────────┘  │
+│                                   │                                        │
+│  ┌─────────────────────────────────┼─────────────────────────────────────┐  │
+│  │                    SERVICE LAYER                                     │  │
+│  │                                                                       │  │
+│  │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐   │  │
+│  │  │Authentication  │    │  OAuth Service  │    │  Email Service  │   │  │
+│  │  │   Service       │    │ (Google OAuth)  │    │ (SMTP + AI)     │   │  │
+│  │  │(JWT + Hashing)  │    │                 │    │                 │   │  │
+│  │  └─────────────────┘    └─────────────────┘    └─────────────────┘   │  │
+│  │                                                                       │  │
+│  │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐   │  │
+│  │  │  Gmail Service  │    │ Stripe Service  │    │ OpenAI Service  │   │  │
+│  │  │ (API Integration│    │ (Payment Proc.) │    │(AI Generation)  │   │  │
+│  │  │                 │    │                 │    │                 │   │  │
+│  │  └─────────────────┘    └─────────────────┘    └─────────────────┘   │  │
+│  └─────────────────────────────────┼─────────────────────────────────────┘  │
+│                                   │                                        │
+│  ┌─────────────────────────────────┼─────────────────────────────────────┐  │
+│  │                   DATA ACCESS LAYER                                  │  │
+│  │                                                                       │  │
+│  │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐   │  │
+│  │  │ Firestore Client│    │ Cloud Storage   │    │ Vector Database │   │  │
+│  │  │ (NoSQL Database)│    │ (File Storage)  │    │ (Embeddings)    │   │  │
+│  │  └─────────────────┘    └─────────────────┘    └─────────────────┘   │  │
+│  └─────────────────────────────────┼─────────────────────────────────────┘  │
+│                                   │                                        │
+│  ┌─────────────────────────────────┼─────────────────────────────────────┐  │
+│  │                   EXTERNAL APIS                                      │  │
+│  │                                                                       │  │
+│  │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐   │  │
+│  │  │   Google APIs   │    │   Stripe API    │    │   OpenAI API    │   │  │
+│  │  │ (Gmail + OAuth) │    │   (Payments)    │    │ (GPT Models)    │   │  │
+│  │  └─────────────────┘    └─────────────────┘    └─────────────────┘   │  │
+│  │                                                                       │  │
+│  │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐   │  │
+│  │  │ Firebase Auth   │    │   SMTP Server   │    │  Rate Limiter   │   │  │
+│  │  │(OAuth Provider) │    │ (Email Sending) │    │   (SlowAPI)     │   │  │
+│  │  └─────────────────┘    └─────────────────┘    └─────────────────┘   │  │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Authentication Flow
+## Authentication Flow
 
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant API as FastAPI
-    participant AUTH as Auth Service
-    participant JWT as JWT Handler
-    participant DB as Firestore
-    participant EMAIL as Email Service
-    
-    Note over C,EMAIL: User Registration Flow
-    C->>API: POST /auth/register
-    API->>AUTH: validate_registration()
-    AUTH->>DB: check_user_exists()
-    DB-->>AUTH: user_not_found
-    AUTH->>AUTH: hash_password()
-    AUTH->>DB: create_user()
-    AUTH->>JWT: create_access_token()
-    AUTH->>EMAIL: send_verification_email()
-    EMAIL-->>AUTH: email_sent
-    AUTH-->>API: registration_success
-    API-->>C: {token, message}
-    
-    Note over C,EMAIL: User Login Flow
-    C->>API: POST /auth/signin
-    API->>AUTH: authenticate_user()
-    AUTH->>DB: get_user_by_email()
-    DB-->>AUTH: user_data
-    AUTH->>AUTH: verify_password()
-    AUTH->>JWT: create_access_token()
-    AUTH-->>API: authentication_success
-    API-->>C: {token, user_data}
-    
-    Note over C,EMAIL: OAuth Flow
-    C->>API: GET /auth/oauth
-    API->>AUTH: initiate_oauth()
-    AUTH-->>C: redirect_to_google
-    C->>AUTH: oauth_callback
-    AUTH->>DB: store_oauth_tokens()
-    AUTH->>JWT: create_access_token()
-    AUTH-->>C: redirect_with_token
+```
+User Registration Flow:
+┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐
+│ Client  │───▶│FastAPI  │───▶│  Auth   │───▶│Firestore│───▶│  Email  │
+│Register │    │Endpoint │    │ Service │    │Database │    │ Service │
+└─────────┘    └─────────┘    └─────────┘    └─────────┘    └─────────┘
+     ▲              │              │              │              │
+     │              ▼              ▼              ▼              ▼
+┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐
+│Response │◀───│   JWT   │◀───│Password │◀───│  User   │◀───│Verification│
+│& Token  │    │ Token   │    │  Hash   │    │ Created │    │Email Sent │
+└─────────┘    └─────────┘    └─────────┘    └─────────┘    └─────────┘
+
+User Login Flow:
+┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐
+│ Client  │───▶│FastAPI  │───▶│  Auth   │───▶│Firestore│───▶│Password │
+│ Login   │    │Endpoint │    │ Service │    │Database │    │Verify   │
+└─────────┘    └─────────┘    └─────────┘    └─────────┘    └─────────┘
+     ▲              │              │              │              │
+     │              ▼              ▼              ▼              ▼
+┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐
+│Dashboard│◀───│   JWT   │◀───│  Auth   │◀───│  User   │◀───│Password │
+│ Access  │    │ Token   │    │Success  │    │  Found  │    │ Match   │
+└─────────┘    └─────────┘    └─────────┘    └─────────┘    └─────────┘
+
+OAuth Flow:
+┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐
+│ Client  │───▶│FastAPI  │───▶│ Google  │───▶│  OAuth  │───▶│ Store   │
+│OAuth Req│    │Redirect │    │  Auth   │    │Callback │    │ Tokens  │
+└─────────┘    └─────────┘    └─────────┘    └─────────┘    └─────────┘
+     ▲              │              │              │              │
+     │              ▼              ▼              ▼              ▼
+┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐
+│App Access│◀──│   JWT   │◀───│  User   │◀───│Firestore│◀───│ Access  │
+│ Granted │    │ Token   │    │ Profile │    │Database │    │ Token   │
+└─────────┘    └─────────┘    └─────────┘    └─────────┘    └─────────┘
 ```
 
-### Email Processing Pipeline
+## Email Processing Pipeline
 
-```mermaid
-graph LR
-    subgraph "Email Input"
-        GMAIL_API[Gmail API<br/>Email Fetch]
-        USER_INPUT[User Input<br/>Draft Request]
-    end
-    
-    subgraph "Processing Pipeline"
-        CLASSIFIER[Email Classifier<br/>ML Model]
-        PROCESSOR[Email Processor<br/>Content Analysis]
-        GENERATOR[AI Generator<br/>OpenAI GPT]
-        VALIDATOR[Content Validator<br/>Safety Checks]
-    end
-    
-    subgraph "Storage & Output"
-        VECTOR_DB[Vector Store<br/>Email Embeddings]
-        FIRESTORE_DB[(Firestore<br/>Drafts & Metadata)]
-        RESPONSE[API Response<br/>Generated Content]
-    end
-    
-    GMAIL_API --> CLASSIFIER
-    USER_INPUT --> PROCESSOR
-    CLASSIFIER --> VECTOR_DB
-    PROCESSOR --> GENERATOR
-    GENERATOR --> VALIDATOR
-    VALIDATOR --> FIRESTORE_DB
-    VALIDATOR --> RESPONSE
-    
-    VECTOR_DB -.-> GENERATOR
-    FIRESTORE_DB -.-> PROCESSOR
-    
-    style CLASSIFIER fill:#FF9800,color:#fff
-    style GENERATOR fill:#10a37f,color:#fff
-    style VECTOR_DB fill:#9C27B0,color:#fff
-    style FIRESTORE_DB fill:#ff6f00,color:#fff
+```
+Email Input Sources:
+┌─────────────────┐    ┌─────────────────┐
+│   Gmail API     │    │  User Input     │
+│ (Email Fetch)   │    │ (Draft Request) │
+└─────────────────┘    └─────────────────┘
+         │                       │
+         ▼                       ▼
+┌─────────────────────────────────────────────────────────────┐
+│                 PROCESSING PIPELINE                        │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
+│  │   Email     │  │   Email     │  │     AI      │         │
+│  │ Classifier  │  │ Processor   │  │ Generator   │         │
+│  │ (ML Model)  │  │ (Analysis)  │  │(OpenAI GPT) │         │
+│  └─────────────┘  └─────────────┘  └─────────────┘         │
+│         │                 │                 │              │
+│         ▼                 ▼                 ▼              │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
+│  │   Vector    │  │  Content    │  │   Safety    │         │
+│  │   Store     │  │ Validation  │  │  Validator  │         │
+│  │(Embeddings) │  │             │  │             │         │
+│  └─────────────┘  └─────────────┘  └─────────────┘         │
+└─────────────────────────────────────────────────────────────┘
+         │                 │                 │
+         ▼                 ▼                 ▼
+┌─────────────────────────────────────────────────────────────┐
+│                   STORAGE & OUTPUT                         │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
+│  │ Firestore   │  │    API      │  │   Email     │         │
+│  │ Database    │  │  Response   │  │   Queue     │         │
+│  │(Metadata)   │  │ (Generated) │  │ (Sending)   │         │
+│  └─────────────┘  └─────────────┘  └─────────────┘         │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-### Database Schema
+## Database Schema
 
-```mermaid
-erDiagram
-    USERS {
-        string id PK
-        string email UK
-        string full_name
-        string password_hash
-        string verification_status
-        string verification_token
-        timestamp token_expiry
-        string google_access_token
-        string google_refresh_token
-        timestamp token_expiry
-        boolean onboarding_completed
-        boolean is_pro
-        int drafts_remaining
-        timestamp created_at
-        timestamp updated_at
-    }
-    
-    DRAFTS {
-        string id PK
-        string user_id FK
-        string draft_subject
-        string draft_body
-        string recipient_email
-        string status
-        timestamp created_at
-        timestamp updated_at
-    }
-    
-    SUBSCRIPTIONS {
-        string id PK
-        string user_id FK
-        string stripe_customer_id
-        string stripe_subscription_id
-        string status
-        string plan_type
-        timestamp current_period_start
-        timestamp current_period_end
-        timestamp created_at
-    }
-    
-    EMAIL_CLASSIFICATIONS {
-        string id PK
-        string user_id FK
-        string email_id
-        string classification
-        float confidence_score
-        json metadata
-        timestamp processed_at
-    }
-    
-    HELP_TICKETS {
-        string id PK
-        string user_id FK
-        string name
-        string email
-        string message
-        string status
-        timestamp created_at
-    }
-    
-    WAITLIST {
-        string id PK
-        string email UK
-        string verification_token
-        timestamp token_expiry
-        boolean verified
-        timestamp verified_at
-        timestamp created_at
-    }
-    
-    USERS ||--o{ DRAFTS : creates
-    USERS ||--o| SUBSCRIPTIONS : has
-    USERS ||--o{ EMAIL_CLASSIFICATIONS : owns
-    USERS ||--o{ HELP_TICKETS : submits
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              DATABASE SCHEMA                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                              USERS                                  │   │
+│  │                                                                     │   │
+│  │  • id (PK)                    • verification_status                 │   │
+│  │  • email (UNIQUE)             • verification_token                  │   │
+│  │  • full_name                  • token_expiry                        │   │
+│  │  • password_hash              • google_access_token                 │   │
+│  │  • onboarding_completed       • google_refresh_token                │   │
+│  │  • is_pro                     • created_at                          │   │
+│  │  • drafts_remaining           • updated_at                          │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                   │                                        │
+│                                   │ (1:N)                                  │
+│                                   ▼                                        │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                             DRAFTS                                 │   │
+│  │                                                                     │   │
+│  │  • id (PK)                    • recipient_email                     │   │
+│  │  • user_id (FK)               • status                              │   │
+│  │  • draft_subject              • created_at                          │   │
+│  │  • draft_body                 • updated_at                          │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                   │                                        │
+│                                   │ (1:N)                                  │
+│                                   ▼                                        │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                        SUBSCRIPTIONS                               │   │
+│  │                                                                     │   │
+│  │  • id (PK)                    • plan_type                           │   │
+│  │  • user_id (FK)               • current_period_start                │   │
+│  │  • stripe_customer_id         • current_period_end                  │   │
+│  │  • stripe_subscription_id     • created_at                          │   │
+│  │  • status                                                           │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                   │                                        │
+│                                   │ (1:N)                                  │
+│                                   ▼                                        │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                    EMAIL_CLASSIFICATIONS                           │   │
+│  │                                                                     │   │
+│  │  • id (PK)                    • confidence_score                    │   │
+│  │  • user_id (FK)               • metadata (JSON)                     │   │
+│  │  • email_id                   • processed_at                        │   │
+│  │  • classification                                                   │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                   │                                        │
+│                                   │ (1:N)                                  │
+│                                   ▼                                        │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                         HELP_TICKETS                               │   │
+│  │                                                                     │   │
+│  │  • id (PK)                    • message                             │   │
+│  │  • user_id (FK)               • status                              │   │
+│  │  • name                       • created_at                          │   │
+│  │  • email                                                            │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                           WAITLIST                                 │   │
+│  │                                                                     │   │
+│  │  • id (PK)                    • verified                            │   │
+│  │  • email (UNIQUE)             • verified_at                         │   │
+│  │  • verification_token         • created_at                          │   │
+│  │  • token_expiry                                                     │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Middleware & Security Stack
+## Middleware & Security Stack
 
-```mermaid
-graph TB
-    subgraph "Request Flow"
-        REQUEST[Incoming Request]
-        RESPONSE[Outgoing Response]
-    end
-    
-    subgraph "Middleware Stack"
-        CORS[CORS Middleware<br/>Cross-Origin Requests]
-        RATE[Rate Limiter<br/>SlowAPI Integration]
-        AUTH[Authentication<br/>JWT Validation]
-        VALIDATION[Request Validation<br/>Pydantic Models]
-    end
-    
-    subgraph "Security Components"
-        JWT_HANDLER[JWT Handler<br/>Token Management]
-        PWD_CONTEXT[Password Context<br/>Bcrypt Hashing]
-        OAUTH_HANDLER[OAuth Handler<br/>Google Integration]
-    end
-    
-    subgraph "Error Handling"
-        HTTP_EXCEPTION[HTTP Exception Handler]
-        RATE_LIMIT_HANDLER[Rate Limit Handler]
-        VALIDATION_HANDLER[Validation Handler]
-    end
-    
-    REQUEST --> CORS
-    CORS --> RATE
-    RATE --> AUTH
-    AUTH --> VALIDATION
-    VALIDATION --> RESPONSE
-    
-    AUTH --> JWT_HANDLER
-    AUTH --> PWD_CONTEXT
-    AUTH --> OAUTH_HANDLER
-    
-    RATE --> RATE_LIMIT_HANDLER
-    AUTH --> HTTP_EXCEPTION
-    VALIDATION --> VALIDATION_HANDLER
-    
-    style CORS fill:#2196F3,color:#fff
-    style RATE fill:#FF9800,color:#fff
-    style AUTH fill:#4CAF50,color:#fff
-    style JWT_HANDLER fill:#9C27B0,color:#fff
+```
+Request Processing Flow:
+┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐
+│Incoming │───▶│  CORS   │───▶│  Rate   │───▶│  Auth   │───▶│Request  │
+│Request  │    │Middleware│    │Limiter  │    │Middleware│    │Validation│
+└─────────┘    └─────────┘    └─────────┘    └─────────┘    └─────────┘
+     ▲              │              │              │              │
+     │              ▼              ▼              ▼              ▼
+┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐
+│Response │◀───│ Error   │◀───│Rate Limit│◀───│   JWT   │◀───│Pydantic │
+│to Client│    │Handler  │    │ Handler │    │Validation│    │ Models  │
+└─────────┘    └─────────┘    └─────────┘    └─────────┘    └─────────┘
+
+Security Components:
+┌─────────────────────────────────────────────────────────────┐
+│                    SECURITY LAYER                          │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
+│  │     JWT     │  │  Password   │  │    OAuth    │         │
+│  │   Handler   │  │  Context    │  │   Handler   │         │
+│  │             │  │  (Bcrypt)   │  │  (Google)   │         │
+│  └─────────────┘  └─────────────┘  └─────────────┘         │
+│                                                             │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
+│  │    CORS     │  │Rate Limiting│  │   Input     │         │
+│  │ Protection  │  │  (SlowAPI)  │  │ Validation  │         │
+│  │             │  │             │  │ (Pydantic)  │         │
+│  └─────────────┘  └─────────────┘  └─────────────┘         │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ## Prerequisites

@@ -41,171 +41,82 @@ Notaic is a sophisticated email automation and management platform that helps us
 
 ## System Architecture
 
-### High-Level Architecture Overview
-
-```mermaid
-graph TB
-    subgraph "Client Layer"
-        WEB[Web Browser]
-        MOBILE[Mobile App]
-    end
-    
-    subgraph "Frontend Layer"
-        NEXTJS[Next.js Frontend<br/>React + TypeScript]
-        UI[UI Components<br/>TailwindCSS + Radix]
-    end
-    
-    subgraph "API Gateway"
-        LB[Load Balancer]
-        CORS[CORS Middleware]
-        RATE[Rate Limiting]
-    end
-    
-    subgraph "Backend Services"
-        API[FastAPI Backend<br/>Python 3.8+]
-        AUTH[Authentication Service<br/>JWT + OAuth2]
-        EMAIL[Email Processing Service<br/>AI Classification]
-        SUB[Subscription Service<br/>Stripe Integration]
-    end
-    
-    subgraph "AI/ML Layer"
-        OPENAI[OpenAI GPT<br/>Email Generation]
-        CLASSIFIER[Email Classifier<br/>ML Model]
-        VECTOR[Vector Store<br/>Email Embeddings]
-    end
-    
-    subgraph "External Services"
-        GMAIL[Gmail API<br/>Email Integration]
-        STRIPE[Stripe API<br/>Payment Processing]
-        FIREBASE[Firebase<br/>Authentication]
-    end
-    
-    subgraph "Data Layer"
-        FIRESTORE[(Firestore<br/>NoSQL Database)]
-        STORAGE[(Cloud Storage<br/>File Storage)]
-    end
-    
-    WEB --> NEXTJS
-    MOBILE --> NEXTJS
-    NEXTJS --> UI
-    NEXTJS --> LB
-    LB --> CORS
-    CORS --> RATE
-    RATE --> API
-    
-    API --> AUTH
-    API --> EMAIL
-    API --> SUB
-    
-    EMAIL --> OPENAI
-    EMAIL --> CLASSIFIER
-    EMAIL --> VECTOR
-    
-    AUTH --> FIREBASE
-    EMAIL --> GMAIL
-    SUB --> STRIPE
-    
-    API --> FIRESTORE
-    API --> STORAGE
-    
-    style NEXTJS fill:#000,color:#fff
-    style API fill:#009688,color:#fff
-    style OPENAI fill:#10a37f,color:#fff
-    style FIRESTORE fill:#ff6f00,color:#fff
-    style GMAIL fill:#ea4335,color:#fff
-    style STRIPE fill:#635bff,color:#fff
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              NOTAIC PLATFORM                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐         │
+│  │   Web Browser   │    │   Mobile App    │    │   API Clients   │         │
+│  └─────────────────┘    └─────────────────┘    └─────────────────┘         │
+│           │                       │                       │                │
+│           └───────────────────────┼───────────────────────┘                │
+│                                   │                                        │
+│  ┌─────────────────────────────────┼─────────────────────────────────────┐  │
+│  │                    FRONTEND LAYER                                     │  │
+│  │                                                                       │  │
+│  │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐   │  │
+│  │  │   Next.js App   │    │  React Components│    │  TailwindCSS    │   │  │
+│  │  │   (TypeScript)  │    │   & UI Library   │    │   Styling       │   │  │
+│  │  └─────────────────┘    └─────────────────┘    └─────────────────┘   │  │
+│  └─────────────────────────────────┼─────────────────────────────────────┘  │
+│                                   │                                        │
+│                            ┌──────┴──────┐                                 │
+│                            │  API Gateway │                                 │
+│                            │ (CORS, Auth) │                                 │
+│                            └──────┬──────┘                                 │
+│                                   │                                        │
+│  ┌─────────────────────────────────┼─────────────────────────────────────┐  │
+│  │                     BACKEND LAYER                                     │  │
+│  │                                                                       │  │
+│  │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐   │  │
+│  │  │   FastAPI App   │    │  Authentication │    │  Email Service  │   │  │
+│  │  │   (Python)      │    │   & OAuth2      │    │   Processing    │   │  │
+│  │  └─────────────────┘    └─────────────────┘    └─────────────────┘   │  │
+│  │                                                                       │  │
+│  │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐   │  │
+│  │  │  Subscription   │    │   AI/ML Models  │    │   Data Access   │   │  │
+│  │  │   Management    │    │  (OpenAI GPT)   │    │     Layer       │   │  │
+│  │  └─────────────────┘    └─────────────────┘    └─────────────────┘   │  │
+│  └─────────────────────────────────┼─────────────────────────────────────┘  │
+│                                   │                                        │
+│  ┌─────────────────────────────────┼─────────────────────────────────────┐  │
+│  │                    EXTERNAL SERVICES                                  │  │
+│  │                                                                       │  │
+│  │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐   │  │
+│  │  │   Gmail API     │    │   Stripe API    │    │   OpenAI API    │   │  │
+│  │  │  (Email Sync)   │    │   (Payments)    │    │ (AI Generation) │   │  │
+│  │  └─────────────────┘    └─────────────────┘    └─────────────────┘   │  │
+│  │                                                                       │  │
+│  │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐   │  │
+│  │  │   Firestore     │    │  Cloud Storage  │    │  Firebase Auth  │   │  │
+│  │  │   (Database)    │    │ (File Storage)  │    │  (OAuth Provider)│   │  │
+│  │  └─────────────────┘    └─────────────────┘    └─────────────────┘   │  │
+│  └─────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Data Flow Architecture
+## Data Flow
 
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant F as Frontend
-    participant A as API Gateway
-    participant B as Backend
-    participant AI as AI Service
-    participant G as Gmail API
-    participant DB as Firestore
-    
-    U->>F: Login Request
-    F->>A: POST /auth/signin
-    A->>B: Authenticate User
-    B->>DB: Verify Credentials
-    DB-->>B: User Data
-    B-->>A: JWT Token
-    A-->>F: Authentication Response
-    F-->>U: Dashboard Access
-    
-    U->>F: Connect Gmail
-    F->>A: GET /auth/oauth
-    A->>B: OAuth Flow
-    B->>G: Request Authorization
-    G-->>B: Access Token
-    B->>DB: Store Token
-    B->>AI: Process Email History
-    AI-->>B: Email Classifications
-    B->>DB: Store Classifications
-    B-->>A: Success Response
-    A-->>F: Gmail Connected
-    
-    U->>F: Generate Email Draft
-    F->>A: POST /email/generate
-    A->>B: Process Request
-    B->>DB: Get User Context
-    B->>AI: Generate Draft
-    AI-->>B: Email Draft
-    B->>DB: Store Draft
-    B-->>A: Draft Response
-    A-->>F: Email Draft
-    F-->>U: Display Draft
 ```
+User Request Flow:
+┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐
+│  User   │───▶│Frontend │───▶│   API   │───▶│Backend  │───▶│Database │
+│ Action  │    │  (UI)   │    │Gateway  │    │Service  │    │ Store   │
+└─────────┘    └─────────┘    └─────────┘    └─────────┘    └─────────┘
+     ▲              │              │              │              │
+     │              ▼              ▼              ▼              ▼
+┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐
+│Response │◀───│  UI     │◀───│Response │◀───│Processed│◀───│  Data   │
+│to User  │    │Update   │    │ Data    │    │ Result  │    │Retrieved│
+└─────────┘    └─────────┘    └─────────┘    └─────────┘    └─────────┘
 
-### Security Architecture
-
-```mermaid
-graph LR
-    subgraph "Security Layers"
-        subgraph "Frontend Security"
-            CSP[Content Security Policy]
-            XSS[XSS Protection]
-            HTTPS[HTTPS Enforcement]
-        end
-        
-        subgraph "API Security"
-            JWT[JWT Authentication]
-            OAUTH[OAuth2 Integration]
-            RATE_LIMIT[Rate Limiting]
-            CORS_SEC[CORS Protection]
-        end
-        
-        subgraph "Data Security"
-            ENCRYPT[Data Encryption]
-            HASH[Password Hashing]
-            TOKEN[Token Management]
-        end
-        
-        subgraph "Infrastructure Security"
-            FIREWALL[Cloud Firewall]
-            IAM[Identity & Access Management]
-            AUDIT[Audit Logging]
-        end
-    end
-    
-    CSP --> JWT
-    XSS --> OAUTH
-    HTTPS --> RATE_LIMIT
-    JWT --> ENCRYPT
-    OAUTH --> HASH
-    RATE_LIMIT --> TOKEN
-    ENCRYPT --> FIREWALL
-    HASH --> IAM
-    TOKEN --> AUDIT
-    
-    style JWT fill:#4CAF50,color:#fff
-    style OAUTH fill:#2196F3,color:#fff
-    style ENCRYPT fill:#FF9800,color:#fff
-    style FIREWALL fill:#F44336,color:#fff
+Email Processing Pipeline:
+┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐
+│ Gmail   │───▶│  Email  │───▶│   AI    │───▶│  Email  │───▶│ Store & │
+│  API    │    │Classify │    │Process  │    │Generate │    │ Respond │
+└─────────┘    └─────────┘    └─────────┘    └─────────┘    └─────────┘
 ```
 
 ## Project Structure
