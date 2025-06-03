@@ -116,6 +116,7 @@ User Request Flow:
 │Response │◀───   UI     │◀─── Response │◀─── Processed│◀───  Data  │
 │to User  │    │Update   │    │ Data    │    │ Result  │    │Retrieved│
 └─────────┘    └─────────┘    └─────────┘    └─────────┘    └─────────┘
+```
 
 Enhanced Email Processing Pipeline:
 ```
