@@ -181,11 +181,11 @@ For detailed documentation:
 Notaic implements an intelligent email processing pipeline using LangGraph for orchestrating a multi-stage workflow:
 
 ```
-┌───────────┐     ┌───────────┐     ┌───────────┐     ┌───────────┐
-│  Classify │────▶│ Prioritize │────▶│  Retrieve  │────▶│  Generate │
-│   Email   │     │   Email    │     │  Similar   │     │  Response │
-└───────────┘     └───────────┘     │   Emails   │     └───────────┘
-                                     └───────────┘
+┌───────────┐     ┌─────────────┐     ┌───────────┐     ┌───────────┐
+│  Classify │────▶ Prioritize  │────▶  Retrieve  │────▶  Generate │
+│   Email   │     │   Email     │     │  Similar  │     │  Response │
+└───────────┘     └─────────────┘     │   Emails  │     └───────────┘
+                                      └───────────┘
 ```
 
 The workflow consists of the following stages:
