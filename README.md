@@ -52,21 +52,21 @@ Notaic is a sophisticated email automation and management platform that helps us
 │           │                       │                       │                 │
 │           └───────────────────────┼───────────────────────┘                 │
 │                                   │                                         │
-│  ┌─────────────────────────────────┼─────────────────────────────────────┐  │
+│  ┌────────────────────────────────|──────────────────────────────────────┐  │
 │  │                    FRONTEND LAYER                                     │  │
 │  │                                                                       │  │
 │  │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    │  │
 │  │  │   Next.js App   │    │  React Components│    │  TailwindCSS    │   │  │
 │  │  │   (TypeScript)  │    │   & UI Library   │    │   Styling       │   │  │
 │  │  └─────────────────┘    └─────────────────┘    └─────────────────┘    │  │
-│  └─────────────────────────────────┼─────────────────────────────────────┘  │
+│  └────────────────────────────────|──────────────────────────────────────┘  │
 │                                   │                                         │
 │                            ┌──────┴──────┐                                  |
-│                            │  API Gateway │                                 │
-│                            │ (CORS, Auth) │                                 │
+│                            │  API Gateway│                                  │
+│                            │ (CORS, Auth)│                                  │
 │                            └──────┬──────┘                                  │
 │                                   │                                         │
-│  ┌─────────────────────────────────┼─────────────────────────────────────┐  │
+│  ┌────────────────────────────────|──────────────────────────────────────┐  │
 │  │                     BACKEND LAYER                                     │  │
 │  │                                                                       │  │
 │  │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    │  │
@@ -84,7 +84,7 @@ Notaic is a sophisticated email automation and management platform that helps us
 │  │  │    Service      │    │  (OpenAI GPT)   │    │     Layer       │    │  │
 │  │  └─────────────────┘    └─────────────────┘    └─────────────────┘    │  │
 │  └─────────────────────────────────┼─────────────────────────────────────┘  │
-│                                   │                                         │
+│                                    │                                        │
 │  ┌─────────────────────────────────┼─────────────────────────────────────┐  │
 │  │                    EXTERNAL SERVICES                                  │  │
 │  │                                                                       │  │
@@ -95,9 +95,9 @@ Notaic is a sophisticated email automation and management platform that helps us
 │  │                                                                       │  │
 │  │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    │  │
 │  │  │   Firestore     │    │  Cloud Storage  │    │  Firebase Auth  │    │  │
-│  │  │   (Database)    │    │ (File Storage)  │    │  (OAuth Provider)│   │  │
+│  │  │   (Database)    │    │ (File Storage)  │    │ (OAuth Provider)│    │  │
 │  │  └─────────────────┘    └─────────────────┘    └─────────────────┘    |  │
-│  └─────────────────────────────────────────────────────────────────────┘    │
+│  └───────────────────────────────────────────────────────────────────────┘  │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -107,23 +107,23 @@ Notaic is a sophisticated email automation and management platform that helps us
 ```
 User Request Flow:
 ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐
-│  User   │───▶ Frontend │───▶   API   │───▶ Backend  │───▶ Database │
+│  User   │───▶ Frontend  ───▶   API    ───▶ Backend  ───▶ Database 
 │ Action  │    │  (UI)   │    │Gateway  │    │Service  │    │ Store   │
 └─────────┘    └─────────┘    └─────────┘    └─────────┘    └─────────┘
      ▲              │              │              │              │
      │              ▼              ▼              ▼              ▼
 ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐
-│Response │◀───   UI     │◀─── Response │◀─── Processed│◀───  Data  │
+│Response  ◀───   UI     ◀─── Response ◀─── Processed ◀───  Data  
 │to User  │    │Update   │    │ Data    │    │ Result  │    │Retrieved│
 └─────────┘    └─────────┘    └─────────┘    └─────────┘    └─────────┘
 ```
 
-Enhanced Email Processing Pipeline:
 ```
+Enhanced Email Processing Pipeline:
 ┌─────────┐    ┌──────────────────────────────────────────────────────────┐     ┌─────────┐
-│ Gmail   │───▶│                LangGraph Agent Workflow                  │───▶│ Store & │
-│  API    │    │  ┌─────────┐    ┌──────────┐    ┌──────────┐    ┌─────────┐    │ Respond │
-└─────────┘    │  │Classify │───▶ Prioritize│───▶  Retrieve│───▶ Generate│    └─────────┘
+│ Gmail   │───▶                LangGraph Agent Workflow                    ───▶  Store & 
+│  API    │    │  ┌─────────┐    ┌──────────┐    ┌──────────┐    ┌─────────┐      Respond 
+└─────────┘    │    Classify ───▶ Prioritize ───▶ Retrieve  ───▶ Generate     └─────────┘
                │  └─────────┘    └──────────┘    └──────────┘    └─────────┘ │
                │                                                             │
                │                  ┌───────────────────────────┐              │
@@ -182,9 +182,9 @@ Notaic implements an intelligent email processing pipeline using LangGraph for o
 
 ```
 ┌───────────┐     ┌─────────────┐     ┌───────────┐     ┌───────────┐
-│  Classify │────▶ Prioritize  │────▶  Retrieve  │────▶  Generate │
-│   Email   │     │   Email     │     │  Similar  │     │  Response │
-└───────────┘     └─────────────┘     │   Emails  │     └───────────┘
+│  Classify  ────▶  Prioritize  ────▶   Retrieve ────▶   Generate  
+│   Email   │     │    Email    │     │  Similar  │     │  Response │
+└───────────┘     └─────────────┘     │  Emails   │     └───────────┘
                                       └───────────┘
 ```
 
