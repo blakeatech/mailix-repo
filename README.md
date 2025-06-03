@@ -75,8 +75,13 @@ Notaic is a sophisticated email automation and management platform that helps us
 │  │  └─────────────────┘    └─────────────────┘    └─────────────────┘   │  │
 │  │                                                                       │  │
 │  │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐   │  │
-│  │  │  Subscription   │    │   AI/ML Models  │    │   Data Access   │   │  │
-│  │  │   Management    │    │  (OpenAI GPT)   │    │     Layer       │   │  │
+│  │  │  Subscription   │    │ LangGraph Agent │    │ Vector Database │   │  │
+│  │  │   Management    │    │    Workflow     │    │     (Pinecone)  │   │  │
+│  │  └─────────────────┘    └─────────────────┘    └─────────────────┘   │  │
+│  │                                                                       │  │
+│  │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐   │  │
+│  │  │   Monitoring    │    │   AI/ML Models  │    │   Data Access   │   │  │
+│  │  │    Service      │    │  (OpenAI GPT)   │    │     Layer       │   │  │
 │  │  └─────────────────┘    └─────────────────┘    └─────────────────┘   │  │
 │  └─────────────────────────────────┼─────────────────────────────────────┘  │
 │                                   │                                        │
@@ -112,11 +117,27 @@ User Request Flow:
 │to User  │    │Update   │    │ Data    │    │ Result  │    │Retrieved│
 └─────────┘    └─────────┘    └─────────┘    └─────────┘    └─────────┘
 
-Email Processing Pipeline:
-┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐
-│ Gmail   │───▶│  Email  │───▶│   AI    │───▶│  Email  │───▶│ Store & │
-│  API    │    │Classify │    │Process  │    │Generate │    │ Respond │
-└─────────┘    └─────────┘    └─────────┘    └─────────┘    └─────────┘
+Enhanced Email Processing Pipeline:
+┌─────────┐    ┌────────────────────────────────────────────────────────┐    ┌─────────┐
+│ Gmail   │───▶│                  LangGraph Agent Workflow                   │───▶│ Store & │
+│  API    │    │  ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐  │    │ Respond │
+└─────────┘    │  │Classify │───▶│Prioritize│───▶│ Retrieve │───▶│Generate │  │    └─────────┘
+                 │  └─────────┘    └─────────┘    └─────────┘    └─────────┘  │
+                 │                                                       │
+                 │                      ┌────────────────────────────────┐                      │
+                 │                      │    Vector Database (Pinecone)    │                      │
+                 │                      └────────────────────────────────┘                      │
+                 │                                       ↑                                       │
+                 └────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────┐
+│                      CI/CD & Monitoring                       │
+│                                                              │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐  │
+│  │  GitHub Actions  │    │  Metrics API    │    │  Structured     │  │
+│  │  (CI/CD Pipeline) │    │  Endpoint      │    │  Logging        │  │
+│  └─────────────────┘    └─────────────────┘    └─────────────────┘  │
+└────────────────────────────────────────────────────────┘
 ```
 
 ## Project Structure
@@ -132,21 +153,71 @@ notaic/
 │   └── [More details in frontend/README.md]
 │
 ├── backend/                # FastAPI backend application
+│   ├── agents/            # LangGraph agents for email processing
 │   ├── auth/              # Authentication services
 │   ├── config/            # Configuration management
 │   ├── models/            # Data models and ML models
+│   ├── prompts/           # Example prompts for AI processing
+│   ├── services/          # Core services including vector database
 │   ├── tests/             # Test suites
 │   │   ├── e2e/          # End-to-end tests
 │   │   └── unit/         # Unit tests
 │   └── [More details in backend/README.md]
 │
 ├── demos/
+├── .github/               # GitHub Actions workflows
 └── README.md             # This file
 ```
 
 For detailed documentation:
 - [Frontend Documentation](frontend/README.md)
 - [Backend Documentation](backend/README.md)
+
+## Agentic Workflow
+
+Notaic implements an intelligent email processing pipeline using LangGraph for orchestrating a multi-stage workflow:
+
+```
+┌───────────┐     ┌───────────┐     ┌───────────┐     ┌───────────┐
+│  Classify │────▶│ Prioritize │────▶│  Retrieve  │────▶│  Generate │
+│   Email   │     │   Email    │     │  Similar   │     │  Response │
+└───────────┘     └───────────┘     │   Emails   │     └───────────┘
+                                     └───────────┘
+```
+
+The workflow consists of the following stages:
+
+1. **Classification**: Analyzes incoming emails to determine category, urgency, and required actions
+2. **Prioritization**: Determines the priority level and suggested response timeframe
+3. **Memory Retrieval**: Searches for similar past emails to provide context
+4. **Response Generation**: Creates appropriate responses based on email content and context
+
+This workflow is implemented in `backend/agents/email_agent.py` using LangGraph's state management and conditional branching capabilities. The system leverages vector embeddings stored in Pinecone or Weaviate to enable memory-aware responses.
+
+## Monitoring & Observability
+
+Notaic includes comprehensive monitoring and observability features:
+
+- **Structured Logging**: All pipeline stages include detailed logging with `logging.info()` calls
+- **Metrics Endpoint**: The `/metrics` API endpoint exposes real-time processing statistics
+- **Performance Tracking**: Response times and throughput metrics are automatically collected
+- **Error Tracking**: Detailed error logs with context for debugging and analysis
+
+The monitoring system tracks:
+- Email processing volumes and success rates
+- Category and priority distributions
+- API request patterns and response times
+- User activity metrics
+
+## Continuous Integration & Deployment
+
+The project uses GitHub Actions for automated testing and deployment:
+
+- **Automated Testing**: Runs pytest on all backend code
+- **Code Quality**: Enforces style and quality standards with flake8
+- **Conditional Deployment**: Optionally triggers deployment on successful builds
+
+The CI/CD pipeline is configured in `.github/workflows/backend.yml` and runs automatically on pushes to the main branch.
 
 ## Getting Started
 
