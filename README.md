@@ -79,6 +79,8 @@ A: We use Python's logging module with structured logs at each LangGraph node. T
 **Q: How do you keep Firestore and vector database in sync?**
 A: After generating a response in the LangGraph workflow, we store the email embedding in the vector database with metadata. It's a simple sequential operation - if the vector store fails, we log the error but don't retry. No sophisticated consistency guarantees beyond Firestore's atomic operations.
 
+### Architecture Overview
+
 ```mermaid
 graph TD
     A[Web Browser] --> B[Next.js Frontend]
@@ -110,6 +112,8 @@ graph TD
     style L fill:#4ecdc4
 ```
 
+### Email Management Flow
+
 ```mermaid
 sequenceDiagram
     participant U as User
@@ -130,6 +134,8 @@ sequenceDiagram
     API->>F: JSON Response
     F->>U: UI Update
 ```
+
+### Agent Interaction
 
 ```mermaid
 graph TD
