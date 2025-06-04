@@ -6,15 +6,6 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-<div align="center">
-  <img 
-    src="demos/notaic-gif.gif" 
-    alt="Notaic Demo" 
-    width="800" 
-    style="border-radius: 8px; border: 2px solid #000;"
-  />
-</div>
-
 ## Overview
 
 Notaic is an email automation platform that uses AI agents to classify, prioritize, and generate contextual responses to emails. The system integrates Gmail API for email ingestion, implements a LangGraph-based processing pipeline, and provides real-time analytics through a Next.js dashboard.
