@@ -12,7 +12,7 @@ Notaic is an email automation platform that uses AI agents to classify, prioriti
 
 ## Why This Matters
 
-Email overload costs knowledge workers 2.5 hours daily in lost productivity. Notaic's intelligent automation reduces response time by 60% while maintaining response quality through vector-based memory retrieval.
+Email overload costs knowledge workers two and a half hours daily in lost productivity. Notaic's intelligent automation reduces response time by 60% while maintaining response quality through vector-based memory retrieval.
 
 ## Key Features
 
