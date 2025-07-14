@@ -1,11 +1,11 @@
-# Notaic Frontend
+# Mailix Frontend
 
 [![Next.js](https://img.shields.io/badge/Next.js-14.2.13-black?style=flat&logo=next.js&logoColor=white)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-18-blue?style=flat&logo=react&logoColor=white)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38B2AC?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-Modern, responsive frontend for Notaic - an email automation and management platform. Built with Next.js, React, TypeScript, and TailwindCSS.
+Modern, responsive frontend for Mailix - an email automation and management platform. Built with Next.js, React, TypeScript, and TailwindCSS.
 
 ## ✨ Features
 
@@ -40,7 +40,7 @@ Modern, responsive frontend for Notaic - an email automation and management plat
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                           NOTAIC FRONTEND ARCHITECTURE                     │
+│                           Mailix FRONTEND ARCHITECTURE                     │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
@@ -188,7 +188,7 @@ Desktop (lg+):   [Header         ]
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/NotaicFrontend.git
+   git clone https://github.com/yourusername/MailixFrontend.git
    cd frontend
    ```
 
@@ -270,12 +270,12 @@ frontend/
 
 Build the Docker image:
 ```bash
-docker build -t notaic-frontend .
+docker build -t Mailix-frontend .
 ```
 
 Run the container:
 ```bash
-docker run -p 3000:3000 notaic-frontend
+docker run -p 3000:3000 Mailix-frontend
 ```
 
 ## 🧪 Testing
