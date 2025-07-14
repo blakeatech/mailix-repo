@@ -1,10 +1,10 @@
-# Notaic Backend
+# Mailix Backend
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115.2-009688.svg?style=flat&logo=FastAPI&logoColor=white)](https://fastapi.tiangolo.com)
 [![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-Notaic is a sophisticated email automation and management platform built with FastAPI. It provides user authentication, email processing, and subscription management capabilities through a robust REST API.
+Mailix is a sophisticated email automation and management platform built with FastAPI. It provides user authentication, email processing, and subscription management capabilities through a robust REST API.
 
 ## Features
 
@@ -34,7 +34,7 @@ Notaic is a sophisticated email automation and management platform built with Fa
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                           NOTAIC BACKEND ARCHITECTURE                      │
+│                           Mailix BACKEND ARCHITECTURE                      │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
@@ -304,8 +304,8 @@ Security Components:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/NotaicBackend.git
-   cd NotaicBackend
+   git clone https://github.com/yourusername/MailixBackend.git
+   cd MailixBackend
    ```
 
 2. Create and activate a virtual environment:
@@ -369,7 +369,7 @@ pytest --cov=app tests/
 ## Project Structure
 
 ```
-NotaicBackend/
+MailixBackend/
 ├── auth/                 # Authentication related modules
 ├── config/              # Configuration files
 ├── data/                # Data storage and management
