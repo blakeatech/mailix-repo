@@ -1,4 +1,4 @@
-# Notaic - Email Automation Platform
+# Mailix - Email Automation Platform
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115.2-009688.svg?style=flat&logo=FastAPI&logoColor=white)](https://fastapi.tiangolo.com)
 [![Next.js](https://img.shields.io/badge/Next.js-14.2.13-black?style=flat&logo=next.js&logoColor=white)](https://nextjs.org/)
@@ -8,11 +8,11 @@
 
 ## Overview
 
-Notaic is an email automation platform that uses AI agents to classify, prioritize, and generate contextual responses to emails. The system integrates Gmail API for email ingestion, implements a LangGraph-based processing pipeline, and provides real-time analytics through a Next.js dashboard.
+Mailix is an email automation platform that uses AI agents to classify, prioritize, and generate contextual responses to emails. The system integrates Gmail API for email ingestion, implements a LangGraph-based processing pipeline, and provides real-time analytics through a Next.js dashboard.
 
 ## Why This Matters
 
-Email overload costs knowledge workers two and a half hours daily in lost productivity. Notaic's intelligent automation reduces response time by 60% while maintaining response quality through vector-based memory retrieval.
+Email overload costs knowledge workers two and a half hours daily in lost productivity. Mailix's intelligent automation reduces response time by 60% while maintaining response quality through vector-based memory retrieval.
 
 ## Key Features
 
@@ -176,7 +176,7 @@ graph TD
 The project follows a monorepo structure with separate frontend and backend components:
 
 ```
-notaic/
+Mailix/
 ├── frontend/                # Next.js frontend application
 │   ├── app/                # Application routes and pages
 │   ├── components/         # React components
@@ -206,7 +206,7 @@ For detailed documentation:
 
 ## Agentic Workflow
 
-Notaic implements an intelligent email processing pipeline using LangGraph for orchestrating a multi-stage workflow:
+Mailix implements an intelligent email processing pipeline using LangGraph for orchestrating a multi-stage workflow:
 
 ```mermaid
 graph LR
@@ -231,7 +231,7 @@ This workflow is implemented in `backend/agents/email_agent.py` using LangGraph'
 
 ## Monitoring & Observability
 
-Notaic includes comprehensive monitoring and observability features:
+Mailix includes comprehensive monitoring and observability features:
 
 - **Structured Logging**: All pipeline stages include detailed logging with `logging.info()` calls
 - **Metrics Endpoint**: The `/metrics` API endpoint exposes real-time processing statistics
@@ -267,8 +267,8 @@ The CI/CD pipeline is configured in `.github/workflows/backend.yml` and runs aut
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/blakeamtech/notaic.git
-   cd notaic
+   git clone https://github.com/blakeamtech/Mailix.git
+   cd Mailix
    ```
 
 2. Set up the backend:
@@ -379,4 +379,4 @@ The Next.js frontend can be deployed to:
 Please read our [Contributing Guidelines](CONTRIBUTING.md) for details on our code of conduct and development process.
 
 ---
-Built with ❤️ by the Notaic Team
+Built with ❤️ by the Mailix Team
